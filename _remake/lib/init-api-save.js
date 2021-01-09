@@ -7,7 +7,7 @@ import { capture } from "../utils/async-utils";
 import RemakeStore from "./remake-store";
 
 
-export function initApiSave ({app}) {
+export async function initApiSave ({app}, callback) {
 
   // route for "/save" and "/app_*/save"
   app.post(/(\/app_[a-z]+[a-z0-9-]*)?\/save/, async (req, res) => {
@@ -33,6 +33,7 @@ export function initApiSave ({app}) {
     let currentUser = req.user;
     let isPageAuthor = currentUser && username && currentUser.details.username === username;
     let existingData = currentUser.appData;
+    let oldData = {...existingData}; // save old data for callback
 
     if (!isPageAuthor) {
       res.json({success: false, reason: "notAuthorized"});
@@ -83,6 +84,9 @@ export function initApiSave ({app}) {
     }
 
     res.json({success: true});
+
+    if(callback != null)
+      await callback({username, newData: existingData, oldData});
 
   })
 

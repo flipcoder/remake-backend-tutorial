@@ -1,4 +1,12 @@
-<h1>Welcome to the app!</h1>
-<div>[[ Dynamic Remake code goes here]]</div>
-<br><br>
-<a href="https://docs.remaketheweb.com/a-simple-example-app/">Try a simple todo app</a>
+<div object>
+  <ul array key="todos" sortable>
+    {{#for todo in todos}}
+      <li 
+        object 
+        key:text="@innerText"
+        edit:text
+      >{{default todo.text "New todo item"}}</li>
+    {{/for}}
+  </ul>
+  <button new:todo>Add Todo</button>
+</div>

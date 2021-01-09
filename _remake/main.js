@@ -21,6 +21,7 @@ import { showConsoleSuccess } from "./utils/console-utils";
 import { capture } from "./utils/async-utils";
 import { setEnvironmentVariables } from "./utils/setup-env";
 import RemakeStore from "./lib/remake-store";
+import { initBackend, runBackend }  from "../app/backend";
 
 // set up environment variables
 setEnvironmentVariables();
@@ -212,14 +213,12 @@ if (RemakeStore.isMultiTenant()) {
 }
 
 // REMAKE CORE FRAMEWORK
-initUserAccounts({ app });
-initApiNew({ app });
-initApiSave({ app });
-initApiUpload({ app });
-initRenderedRoutes({ app });
+initUserAccounts({app});
+initBackend({app});
+initRenderedRoutes({app});
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log('\n');
   showConsoleSuccess(`Visit your Remake app: http://localhost:${PORT}`);
   showConsoleSuccess(`Check this log to see the requests made by the app, as you use it.`);
@@ -228,4 +227,5 @@ app.listen(PORT, () => {
   if (process.send) {
     process.send("online");
   }
+  await runBackend({app});
 });
