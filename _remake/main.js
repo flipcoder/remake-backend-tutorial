@@ -21,7 +21,17 @@ import { showConsoleSuccess } from "./utils/console-utils";
 import { capture } from "./utils/async-utils";
 import { setEnvironmentVariables } from "./utils/setup-env";
 import RemakeStore from "./lib/remake-store";
-import { initBackend, runBackend }  from "../app/backend";
+
+// optionally import backend code
+let backend = null;
+try {
+  backend = require("../app/backend");
+} catch (err) {
+  // ignore module errors
+  if(err.code !== "MODULE_NOT_FOUND") {
+    throw err;
+  }
+}
 
 // set up environment variables
 setEnvironmentVariables();
@@ -214,11 +224,15 @@ if (RemakeStore.isMultiTenant()) {
 
 // REMAKE CORE FRAMEWORK
 initUserAccounts({app});
-initBackend({app});
+initApiNew({app}, backend!=null ? backend.onNew : null);
+initApiSave({app}, backend!=null ? backend.onSave : null);
+initApiUpload({app});
+if(backend != null && backend.init != null)
+  backend.init({app});
 initRenderedRoutes({app});
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
   console.log('\n');
   showConsoleSuccess(`Visit your Remake app: http://localhost:${PORT}`);
   showConsoleSuccess(`Check this log to see the requests made by the app, as you use it.`);
@@ -227,5 +241,6 @@ app.listen(PORT, async () => {
   if (process.send) {
     process.send("online");
   }
-  await runBackend({app});
+  if(backend != null)
+    backend.run({app});
 });

@@ -5,7 +5,6 @@ npm-debug.log
 
 app/data/database
 app/data/uploads
-app/data/stats.json
 
 .env
 .remake

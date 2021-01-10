@@ -14,7 +14,7 @@ import { getHtmlWithUniqueIds } from "../utils/get-html-with-unique-ids";
 import RemakeStore from "./remake-store";
 
 
-export async function initApiNew ({app}, callback) {
+export function initApiNew ({app}, callback) {
 
   // route for "/new" and "/app_*/new"
   app.post(/(\/app_[a-z]+[a-z0-9-]*)?\/new/, async (req, res) => {
@@ -102,7 +102,14 @@ export async function initApiNew ({app}, callback) {
     res.json({success: true, htmlString: htmlStringWithUniqueIds});
 
     if(callback != null)
-      await callback({username, data});
+      callback({
+        app,
+        user: {
+          name: currentUser.details.username,
+          email: currentUser.details.email
+        },
+        data
+      });
   })
 
 }
